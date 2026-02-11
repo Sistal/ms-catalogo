@@ -1,0 +1,919 @@
+basePath: /
+definitions:
+  controllers.CampaignResponse:
+    properties:
+      activa:
+        type: boolean
+      fechaFin:
+        type: string
+      fechaInicio:
+        type: string
+      id:
+        type: string
+      nombre:
+        type: string
+    type: object
+  controllers.IDLabelResponse:
+    properties:
+      id:
+        type: string
+      label:
+        type: string
+    type: object
+  controllers.MasterDataResponse:
+    properties:
+      campaign:
+        $ref: '#/definitions/controllers.CampaignResponse'
+      changeReasons:
+        items:
+          $ref: '#/definitions/controllers.IDLabelResponse'
+        type: array
+      garmentTypes:
+        items:
+          $ref: '#/definitions/controllers.IDLabelResponse'
+        type: array
+      sizes:
+        items:
+          $ref: '#/definitions/controllers.IDLabelResponse'
+        type: array
+    type: object
+  controllers.PrendaResponse:
+    properties:
+      fotoUrl:
+        type: string
+      id:
+        type: string
+      nombre:
+        type: string
+      tallas:
+        items:
+          type: string
+        type: array
+      tipo:
+        type: string
+    type: object
+  controllers.UniformeResponse:
+    properties:
+      descripcion:
+        type: string
+      id:
+        type: string
+      nombre:
+        type: string
+      prendas:
+        items:
+          $ref: '#/definitions/controllers.PrendaResponse'
+        type: array
+    type: object
+  models.ActualizarCantidadDTO:
+    properties:
+      cantidad:
+        minimum: 1
+        type: integer
+    required:
+    - cantidad
+    type: object
+  models.AgregarPrendaUniformeDTO:
+    properties:
+      cantidad:
+        minimum: 1
+        type: integer
+      id_prenda:
+        type: integer
+    required:
+    - cantidad
+    - id_prenda
+    type: object
+  models.CreatePrendaDTO:
+    properties:
+      descripcion:
+        type: string
+      id_genero:
+        type: integer
+      id_temporada:
+        type: integer
+      id_tipo_prenda:
+        type: integer
+      maternal:
+        type: boolean
+      nombre_prenda:
+        type: string
+      tallas_disponibles:
+        type: string
+      url_imagen:
+        type: string
+    required:
+    - id_genero
+    - id_temporada
+    - id_tipo_prenda
+    - nombre_prenda
+    - tallas_disponibles
+    type: object
+  models.CreateTemporadaDTO:
+    properties:
+      fecha_fin:
+        type: string
+      fecha_inicio:
+        type: string
+      id_estado_temporada:
+        type: integer
+      nombre_temporada:
+        type: string
+    required:
+    - fecha_fin
+    - fecha_inicio
+    - nombre_temporada
+    type: object
+  models.CreateUniformeDTO:
+    properties:
+      descripcion:
+        type: string
+      id_segmento:
+        type: integer
+      nombre_uniforme:
+        type: string
+      prendas:
+        items:
+          $ref: '#/definitions/models.PrendaUniformeCantidadDTO'
+        minItems: 1
+        type: array
+    required:
+    - id_segmento
+    - nombre_uniforme
+    - prendas
+    type: object
+  models.ErrorInfo:
+    properties:
+      code:
+        type: string
+      details: {}
+    type: object
+  models.PrendaUniformeCantidadDTO:
+    properties:
+      cantidad:
+        minimum: 1
+        type: integer
+      id_prenda:
+        type: integer
+    required:
+    - cantidad
+    - id_prenda
+    type: object
+  models.SearchPrendasDTO:
+    properties:
+      generos:
+        items:
+          type: integer
+        type: array
+      limit:
+        type: integer
+      maternal:
+        type: boolean
+      nombre:
+        type: string
+      page:
+        type: integer
+      proveedores:
+        items:
+          type: integer
+        type: array
+      tallas:
+        items:
+          type: string
+        type: array
+      temporadas:
+        items:
+          type: integer
+        type: array
+      tipos_prenda:
+        items:
+          type: integer
+        type: array
+    type: object
+  models.StandardResponse:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/models.ErrorInfo'
+      errors: {}
+      message:
+        type: string
+      meta: {}
+      success:
+        type: boolean
+    type: object
+  models.UpdatePrendaDTO:
+    properties:
+      descripcion:
+        type: string
+      id_genero:
+        type: integer
+      id_temporada:
+        type: integer
+      id_tipo_prenda:
+        type: integer
+      maternal:
+        type: boolean
+      nombre_prenda:
+        type: string
+      tallas_disponibles:
+        type: string
+      url_imagen:
+        type: string
+    type: object
+  models.UpdateUniformeDTO:
+    properties:
+      descripcion:
+        type: string
+      id_segmento:
+        type: integer
+      nombre_uniforme:
+        type: string
+    type: object
+  models.VincularProveedorDTO:
+    properties:
+      id_empresa:
+        type: integer
+    required:
+    - id_empresa
+    type: object
+host: localhost:8084
+info:
+  contact:
+    email: soporte@sistal.com
+    name: Soporte API
+  description: |-
+    API del Microservicio de Catálogo de Prendas y Uniformes
+    Gestiona el catálogo de prendas, uniformes, temporadas y datos maestros
+  license:
+    name: MIT
+  title: MS-Catalogo API
+  version: "1.0"
+paths:
+  /api/v1/empresas:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de empresas (proveedores/clientes) con paginación
+      parameters:
+      - default: 1
+        description: Número de página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite por página
+        in: query
+        name: limit
+        type: integer
+      - description: Filtrar por tipo (1=Cliente, 2=Proveedor, 3=Ambos)
+        in: query
+        name: id_tipo_empresa
+        type: integer
+      - description: Buscar en nombre o RUT
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Listar Empresas
+      tags:
+      - Master Data
+  /api/v1/prendas:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista paginada de prendas con filtros
+      parameters:
+      - default: 1
+        description: Número de página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite por página
+        in: query
+        name: limit
+        type: integer
+      - description: Filtrar por tipo de prenda
+        in: query
+        name: id_tipo_prenda
+        type: integer
+      - description: Filtrar por género
+        in: query
+        name: id_genero
+        type: integer
+      - description: Filtrar por temporada
+        in: query
+        name: id_temporada
+        type: integer
+      - description: Solo prendas maternales
+        in: query
+        name: maternal
+        type: boolean
+      - description: Buscar en nombre o descripción
+        in: query
+        name: search
+        type: string
+      - default: '"nombre_prenda"'
+        description: Campo para ordenar
+        in: query
+        name: sort_by
+        type: string
+      - default: '"asc"'
+        description: Orden (asc|desc)
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Listar Prendas
+      tags:
+      - Prendas
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva prenda en el catálogo
+      parameters:
+      - description: Datos de la prenda
+        in: body
+        name: prenda
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreatePrendaDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Crear Prenda
+      tags:
+      - Prendas
+  /api/v1/prendas/{id_prenda}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una prenda del catálogo
+      parameters:
+      - description: ID de la prenda
+        in: path
+        name: id_prenda
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Eliminar Prenda
+      tags:
+      - Prendas
+    get:
+      consumes:
+      - application/json
+      description: Obtiene información detallada de una prenda
+      parameters:
+      - description: ID de la prenda
+        in: path
+        name: id_prenda
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Obtener Prenda por ID
+      tags:
+      - Prendas
+    put:
+      consumes:
+      - application/json
+      description: Actualiza una prenda existente
+      parameters:
+      - description: ID de la prenda
+        in: path
+        name: id_prenda
+        required: true
+        type: integer
+      - description: Datos a actualizar
+        in: body
+        name: prenda
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdatePrendaDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Actualizar Prenda
+      tags:
+      - Prendas
+  /api/v1/prendas/{id_prenda}/proveedores:
+    post:
+      consumes:
+      - application/json
+      description: Asocia un proveedor a una prenda
+      parameters:
+      - description: ID de la prenda
+        in: path
+        name: id_prenda
+        required: true
+        type: integer
+      - description: ID del proveedor
+        in: body
+        name: proveedor
+        required: true
+        schema:
+          $ref: '#/definitions/models.VincularProveedorDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Vincular Proveedor a Prenda
+      tags:
+      - Prendas
+  /api/v1/prendas/buscar:
+    post:
+      consumes:
+      - application/json
+      description: Búsqueda avanzada con múltiples filtros
+      parameters:
+      - description: Criterios de búsqueda
+        in: body
+        name: search
+        required: true
+        schema:
+          $ref: '#/definitions/models.SearchPrendasDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Búsqueda Avanzada de Prendas
+      tags:
+      - Prendas
+  /api/v1/segmentos:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de segmentos de negocio
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Listar Segmentos
+      tags:
+      - Master Data
+  /api/v1/temporadas:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de temporadas/campañas con paginación
+      parameters:
+      - default: 1
+        description: Número de página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite por página
+        in: query
+        name: limit
+        type: integer
+      - description: Filtrar por estado (40=Activa, 41=Inactiva, 42=Finalizada)
+        in: query
+        name: id_estado_temporada
+        type: integer
+      - description: Solo temporada activa
+        in: query
+        name: activa_solo
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Listar Temporadas
+      tags:
+      - Temporadas
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva temporada
+      parameters:
+      - description: Datos de la temporada
+        in: body
+        name: temporada
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTemporadaDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Crear Temporada
+      tags:
+      - Temporadas
+  /api/v1/temporadas/{id_temporada}/activar:
+    patch:
+      consumes:
+      - application/json
+      description: Activa una temporada (desactiva automáticamente la temporada actual)
+      parameters:
+      - description: ID de la temporada
+        in: path
+        name: id_temporada
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Activar Temporada
+      tags:
+      - Temporadas
+  /api/v1/temporadas/activa:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene la temporada actualmente activa
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Obtener Temporada Activa
+      tags:
+      - Temporadas
+  /api/v1/tipos-prenda:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de tipos de prenda disponibles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Listar Tipos de Prenda
+      tags:
+      - Master Data
+  /api/v1/uniformes:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de uniformes con paginación y filtros
+      parameters:
+      - default: 1
+        description: Número de página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite por página
+        in: query
+        name: limit
+        type: integer
+      - description: Filtrar por segmento
+        in: query
+        name: id_segmento
+        type: integer
+      - description: Buscar en nombre o descripción
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Listar Uniformes
+      tags:
+      - Uniformes
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo conjunto de uniforme
+      parameters:
+      - description: Datos del uniforme
+        in: body
+        name: uniforme
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUniformeDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Crear Uniforme
+      tags:
+      - Uniformes
+  /api/v1/uniformes/{id_uniforme}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene información detallada de un uniforme con todas sus prendas
+      parameters:
+      - description: ID del uniforme
+        in: path
+        name: id_uniforme
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Obtener Uniforme por ID
+      tags:
+      - Uniformes
+    put:
+      consumes:
+      - application/json
+      description: Actualiza información básica del uniforme
+      parameters:
+      - description: ID del uniforme
+        in: path
+        name: id_uniforme
+        required: true
+        type: integer
+      - description: Datos a actualizar
+        in: body
+        name: uniforme
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUniformeDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Actualizar Uniforme
+      tags:
+      - Uniformes
+  /api/v1/uniformes/{id_uniforme}/prendas:
+    post:
+      consumes:
+      - application/json
+      description: Agrega una prenda a un uniforme existente
+      parameters:
+      - description: ID del uniforme
+        in: path
+        name: id_uniforme
+        required: true
+        type: integer
+      - description: Prenda a agregar
+        in: body
+        name: prenda
+        required: true
+        schema:
+          $ref: '#/definitions/models.AgregarPrendaUniformeDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Agregar Prenda a Uniforme
+      tags:
+      - Uniformes
+  /api/v1/uniformes/{id_uniforme}/prendas/{id_prenda}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una prenda de un uniforme
+      parameters:
+      - description: ID del uniforme
+        in: path
+        name: id_uniforme
+        required: true
+        type: integer
+      - description: ID de la prenda
+        in: path
+        name: id_prenda
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Eliminar Prenda de Uniforme
+      tags:
+      - Uniformes
+    put:
+      consumes:
+      - application/json
+      description: Actualiza la cantidad de una prenda en el uniforme
+      parameters:
+      - description: ID del uniforme
+        in: path
+        name: id_uniforme
+        required: true
+        type: integer
+      - description: ID de la prenda
+        in: path
+        name: id_prenda
+        required: true
+        type: integer
+      - description: Nueva cantidad
+        in: body
+        name: cantidad
+        required: true
+        schema:
+          $ref: '#/definitions/models.ActualizarCantidadDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Actualizar Cantidad de Prenda en Uniforme
+      tags:
+      - Uniformes
+  /garments/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get garment details by ID (legacy endpoint)
+      parameters:
+      - description: Garment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get Garment (Legacy)
+      tags:
+      - Garments (Legacy)
+  /master-data:
+    get:
+      consumes:
+      - application/json
+      description: Get active campaign, garment types, sizes, and change reasons
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.MasterDataResponse'
+      summary: Get Master Data
+      tags:
+      - Master Data
+  /uniforms:
+    get:
+      consumes:
+      - application/json
+      description: Get all uniforms with their garments (legacy endpoint)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.UniformeResponse'
+            type: array
+      summary: List Uniforms (Legacy)
+      tags:
+      - Uniforms (Legacy)
+schemes:
+- http
+- https
+swagger: "2.0"
+tags:
+- description: Gestión de prendas del catálogo
+  name: Prendas
+- description: Gestión de uniformes y conjuntos de prendas
+  name: Uniformes
+- description: Gestión de temporadas/campañas
+  name: Temporadas
+- description: Datos maestros (tipos de prenda, segmentos, empresas)
+  name: Master Data
+- description: Endpoints legacy para compatibilidad
+  name: Uniforms (Legacy)
+- description: Endpoints legacy para compatibilidad
+  name: Garments (Legacy)
