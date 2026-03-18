@@ -109,9 +109,11 @@ func main() {
 		}
 
 		// ========== MASTER DATA ==========
-		v1.GET("/tipos-prenda", controllers.GetTiposPrenda) // GET /api/v1/tipos-prenda
-		v1.GET("/segmentos", controllers.GetSegmentos)      // GET /api/v1/segmentos
-		v1.GET("/empresas", controllers.GetEmpresas)        // GET /api/v1/empresas
+		v1.GET("/tipos-prenda", controllers.GetTiposPrenda)                   // GET /api/v1/tipos-prenda
+		v1.GET("/segmentos", controllers.GetSegmentos)                        // GET /api/v1/segmentos
+		v1.GET("/segmentos/:id_empresa", controllers.GetSegmentosByEmpresa)   // GET /api/v1/segmentos/:id_empresa
+		v1.GET("/sucursales/:id_empresa", controllers.GetSucursalesByEmpresa) // GET /api/v1/sucursales/:id_empresa
+		v1.GET("/empresas", controllers.GetEmpresas)                          // GET /api/v1/empresas
 	}
 
 	// Start server

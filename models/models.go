@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // Estado: Tabla de estados para diversas entidades
 type Estado struct {
 	IDEstado     int    `gorm:"primaryKey;column:id_estado"`
@@ -31,9 +33,13 @@ func (Genero) TableName() string { return "\"Genero\"" }
 
 // Segmento: Tabla de segmentos de negocio
 type Segmento struct {
-	IDSegmento     int    `gorm:"primaryKey;column:id_segmento"`
-	NombreSegmento string `gorm:"column:nombre_segmento"`
-	Descripcion    string `gorm:"column:descripcion"`
+	IDSegmento         int        `gorm:"primaryKey;column:id_segmento"`
+	NombreSegmento     string     `gorm:"column:nombre_segmento"`
+	Descripcion        string     `gorm:"column:descripcion"`
+	FechaCreacion      *time.Time `gorm:"column:fecha_creacion;type:date"`
+	FechaModificacion  *time.Time `gorm:"column:fecha_modificacion;type:date"`
+	IDEmpresa          *int       `gorm:"column:id_empresa"`
+	EmpresaResponsable *Empresa   `gorm:"foreignKey:IDEmpresa;references:IDEmpresa"`
 }
 
 func (Segmento) TableName() string { return "\"Segmento\"" }
@@ -48,16 +54,44 @@ func (TipoPrenda) TableName() string { return "\"Tipo Prenda\"" }
 
 // Empresa: Tabla de empresas (clientes/proveedores)
 type Empresa struct {
-	IDEmpresa     int    `gorm:"primaryKey;column:id_empresa"`
-	NombreEmpresa string `gorm:"column:nombre_empresa"`
-	RutEmpresa    string `gorm:"column:rut_empresa"`
-	Direccion     string `gorm:"column:direccion"`
-	Telefono      string `gorm:"column:telefono"`
-	Email         string `gorm:"column:email"`
-	IDTipoEmpresa int    `gorm:"column:id_tipo_empresa"` // 1=Cliente, 2=Proveedor, 3=Ambos
+	IDEmpresa           int        `gorm:"primaryKey;column:id_empresa"`
+	NombreEmpresa       string     `gorm:"column:razon_social"`
+	RutEmpresa          string     `gorm:"column:identificador_tributario"`
+	Telefono            string     `gorm:"column:telefono"`
+	Email               string     `gorm:"column:email"`
+	FechaRegistro       *time.Time `gorm:"column:fecha_registro;type:date"`
+	FechaModificacion   *time.Time `gorm:"column:fecha_modificacion;type:date"`
+	Direccion           string     `gorm:"column:direccion"`
+	IDEstadoEmpresa     *int       `gorm:"column:id_estado_empresa"`
+	IDTipoEmpresa       int        `gorm:"column:id_tipo_empresa"` // 1=Cliente, 2=Proveedor, 3=Ambos
+	IDUsuario           *int       `gorm:"column:id_usuario"`
+	EstadoEmpresa       *Estado    `gorm:"foreignKey:IDEstadoEmpresa;references:IDEstado"`
+	SucursalesAsociadas []Sucursal `gorm:"many2many:Sucursal - Empresa;foreignKey:IDEmpresa;joinForeignKey:id_empresa;References:IDSucursal;joinReferences:id_sucursal"`
 }
 
 func (Empresa) TableName() string { return "\"Empresa\"" }
+
+// Sucursal: Mapeo exacto a tabla "Sucursal"
+type Sucursal struct {
+	IDSucursal     int       `gorm:"primaryKey;column:id_sucursal"`
+	NombreSucursal string    `gorm:"column:nombre_sucursal"`
+	Direccion      string    `gorm:"column:direccion"`
+	EstadoSucursal *int      `gorm:"column:estado_sucursal"`
+	Estado         *Estado   `gorm:"foreignKey:EstadoSucursal;references:IDEstado"`
+	Empresas       []Empresa `gorm:"many2many:Sucursal - Empresa;foreignKey:IDSucursal;joinForeignKey:id_sucursal;References:IDEmpresa;joinReferences:id_empresa"`
+}
+
+func (Sucursal) TableName() string { return "\"Sucursal\"" }
+
+// SucursalEmpresa: Tabla intermedia Sucursal - Empresa
+type SucursalEmpresa struct {
+	IDSucursal int      `gorm:"primaryKey;column:id_sucursal"`
+	IDEmpresa  int      `gorm:"primaryKey;column:id_empresa"`
+	Sucursal   Sucursal `gorm:"foreignKey:IDSucursal;references:IDSucursal"`
+	Empresa    Empresa  `gorm:"foreignKey:IDEmpresa;references:IDEmpresa"`
+}
+
+func (SucursalEmpresa) TableName() string { return "\"Sucursal - Empresa\"" }
 
 // Prenda: Mapeo exacto a tabla "Prenda"
 type Prenda struct {

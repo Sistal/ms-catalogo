@@ -91,8 +91,8 @@ func ListPrendas(c *gin.Context) {
 		proveedores := make([]models.EmpresaBasicDTO, 0)
 		for _, pp := range proveedorPrendas {
 			proveedores = append(proveedores, models.EmpresaBasicDTO{
-				IDEmpresa:     pp.Empresa.IDEmpresa,
-				NombreEmpresa: pp.Empresa.NombreEmpresa,
+				IDEmpresa:   pp.Empresa.IDEmpresa,
+				RazonSocial: pp.Empresa.NombreEmpresa,
 			})
 		}
 
@@ -153,10 +153,10 @@ func GetPrenda(c *gin.Context) {
 	proveedores := make([]models.EmpresaBasicDTO, 0)
 	for _, pp := range proveedorPrendas {
 		proveedores = append(proveedores, models.EmpresaBasicDTO{
-			IDEmpresa:     pp.Empresa.IDEmpresa,
-			NombreEmpresa: pp.Empresa.NombreEmpresa,
-			RutEmpresa:    pp.Empresa.RutEmpresa,
-			Email:         pp.Empresa.Email,
+			IDEmpresa:               pp.Empresa.IDEmpresa,
+			RazonSocial:             pp.Empresa.NombreEmpresa,
+			IdentificadorTributario: pp.Empresa.RutEmpresa,
+			Email:                   pp.Empresa.Email,
 		})
 	}
 
@@ -555,9 +555,9 @@ func VincularProveedor(c *gin.Context) {
 	}
 
 	middleware.SuccessMessageResponse(c, http.StatusCreated, "Proveedor vinculado exitosamente", gin.H{
-		"id_prenda":      prenda.IDPrenda,
-		"id_empresa":     empresa.IDEmpresa,
-		"nombre_prenda":  prenda.NombrePrenda,
-		"nombre_empresa": empresa.NombreEmpresa,
+		"id_prenda":     prenda.IDPrenda,
+		"id_empresa":    empresa.IDEmpresa,
+		"nombre_prenda": prenda.NombrePrenda,
+		"razon_social":  empresa.NombreEmpresa,
 	})
 }

@@ -198,6 +198,13 @@ type CreateTemporadaDTO struct {
 
 // =============== DTOs Auxiliares ===============
 
+// SucursalDTO información básica de sucursal
+type SucursalDTO struct {
+	IDSucursal     int    `json:"id_sucursal"`
+	NombreSucursal string `json:"nombre_sucursal"`
+	Direccion      string `json:"direccion"`
+}
+
 // TipoPrendaDTO información básica de tipo de prenda
 type TipoPrendaDTO struct {
 	IDTipoPrenda     int    `json:"id_tipo_prenda"`
@@ -235,22 +242,25 @@ type TemporadaBasicDTO struct {
 
 // EmpresaBasicDTO información básica de empresa
 type EmpresaBasicDTO struct {
-	IDEmpresa     int    `json:"id_empresa"`
-	NombreEmpresa string `json:"nombre_empresa"`
-	RutEmpresa    string `json:"rut_empresa,omitempty"`
-	Email         string `json:"email,omitempty"`
+	IDEmpresa               int    `json:"id_empresa"`
+	RazonSocial             string `json:"razon_social"`
+	IdentificadorTributario string `json:"identificador_tributario,omitempty"`
+	Email                   string `json:"email,omitempty"`
 }
 
 // EmpresaResponseDTO respuesta detallada de empresa
 type EmpresaResponseDTO struct {
-	IDEmpresa            int            `json:"id_empresa"`
-	NombreEmpresa        string         `json:"nombre_empresa"`
-	RutEmpresa           string         `json:"rut_empresa"`
-	Direccion            string         `json:"direccion"`
-	Telefono             string         `json:"telefono"`
-	Email                string         `json:"email"`
-	TipoEmpresa          TipoEmpresaDTO `json:"tipo_empresa"`
-	PrendasSuministradas int            `json:"prendas_suministradas,omitempty"`
+	IDEmpresa               int            `json:"id_empresa"`
+	RazonSocial             string         `json:"razon_social"`
+	IdentificadorTributario string         `json:"identificador_tributario"`
+	Direccion               string         `json:"direccion"`
+	Telefono                string         `json:"telefono"`
+	Email                   string         `json:"email"`
+	FechaRegistro           string         `json:"fecha_registro,omitempty"`
+	FechaModificacion       string         `json:"fecha_modificacion,omitempty"`
+	EstadoEmpresa           *EstadoDTO     `json:"estado_empresa,omitempty"`
+	TipoEmpresa             TipoEmpresaDTO `json:"tipo_empresa"`
+	PrendasSuministradas    int            `json:"prendas_suministradas,omitempty"`
 }
 
 // TipoEmpresaDTO tipo de empresa
