@@ -157,11 +157,11 @@ func GetEmpresas(c *gin.Context) {
 // @Tags Master Data
 // @Accept json
 // @Produce json
-// @Param id_empresa path int true "ID de Empresa"
+// @Param id path int true "ID de Empresa"
 // @Success 200 {object} models.StandardResponse
-// @Router /api/v1/segmentos/{id_empresa} [get]
+// @Router /api/v1/segmentos/{id} [get]
 func GetSegmentosByEmpresa(c *gin.Context) {
-	idEmpresa := utils.ParseQueryInt(c.Param("id_empresa"), 0)
+	idEmpresa := utils.ParseQueryInt(c.Param("id"), 0)
 	if idEmpresa <= 0 {
 		middleware.ErrorResponseWithCode(c, http.StatusBadRequest, "Datos de entrada inválidos", models.ErrorValidation, "ID de empresa inválido")
 		return

@@ -528,3 +528,57 @@ func EliminarPrendaUniforme(c *gin.Context) {
 
 	middleware.SuccessMessageResponse(c, http.StatusOK, "Prenda eliminada del uniforme exitosamente", nil)
 }
+
+// GetUniformesBySegmento godoc
+// @Summary Listar Uniformes por Segmento
+// @Description Obtiene lista de uniformes asignados a un segmento específico
+// @Tags Uniformes
+// @Accept json
+// @Produce json
+// @Param id path int true "ID del Segmento"
+// @Success 200 {object} models.StandardResponse
+// @Router /api/v1/segmentos/{id}/uniformes [get]
+func GetUniformesBySegmento(c *gin.Context) {
+	idSegmento := utils.ParseQueryInt(c.Param("id"), 0)
+
+	var uniformes []models.Uniforme
+	// Traer todos sin paginación
+	initializers.DB.Model(&models.Uniforme{}).
+		Where("id_segmento = ?", idSegmento).
+		Preload("Segmento").
+		Find(&uniformes)
+
+	// Construir respuesta
+	response := make([]models.UniformeListDTO, 0)
+	for _, u := range uniformes {
+		// Contar prendas y obtener preview
+		var uniformePrendas []models.UniformePrenda
+		initializers.DB.Where("id_uniforme = ?", u.IDUniforme).Find(&uniformePrendas)
+
+		prendasPreview := make([]string, 0)
+		for _, up := range uniformePrendas {
+			var prenda models.Prenda
+			if err := initializers.DB.First(&prenda, "id_prenda = ?", up.IDPrenda).Error; err == nil {
+				prendasPreview = append(prendasPreview, fmt.Sprintf("%s (%d)", prenda.NombrePrenda, up.Cantidad))
+			}
+		}
+
+		response = append(response, models.UniformeListDTO{
+			IDUniforme:     u.IDUniforme,
+			NombreUniforme: u.NombreUniforme,
+			Descripcion:    u.Descripcion,
+			Segmento: models.SegmentoDTO{
+				IDSegmento:     u.Segmento.IDSegmento,
+				NombreSegmento: u.Segmento.NombreSegmento,
+			},
+			TotalPrendas:   len(uniformePrendas),
+			PrendasPreview: prendasPreview,
+		})
+	}
+
+	meta := gin.H{
+		"total": len(response),
+	}
+
+	middleware.SuccessResponseWithMeta(c, http.StatusOK, response, meta)
+}
